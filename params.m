@@ -23,7 +23,6 @@ c = @(x) (0) .* (x >= 0 & x <= 0.05) + ...
 S = pi*R^2;                    % Rotor disk area [m^2]
 W = m*g;                       % Weight of the helicopter [N]
 
-
 % ------------------
 %   Air Parameters
 % ------------------
