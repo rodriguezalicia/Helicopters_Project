@@ -32,12 +32,23 @@ function results = bet(params)
     % Theta distribution
     theta0(:) = 6/(sigma*params.CL_alpha)+ 3*lambda(:)/2 - 3*params.theta_t; % Collective pitch angle
 
-    % Alicia: queda hacer la integral del Cpo y luego sacar Cp y la potencia. 
+    % Profile Power Coefficient (CPo) calculation
+    alpha = linspace(0,1,params.alpha_npoints); %Defining the vector for the angles of attack alpha
+    I = 0.5*sigma.*params.cd(alpha).*alpha.^3; %Defining the integrand for the CPo integral
+    CPo = trapz(alpha,I);
 
+    % Power Coefficient (CP) calculation
+    CP(:) = CPi(:) + ones(length(params.Vz),1)*CPo;
+
+    % Power
+    Power(:) = params.rho*params.S*(params.Omega*params.R)^3*CP(:)/1000;
 
     % Store results in a structure
     results.Ct = Ct;
     results.CPi = CPi;
     results.lambda = lambda;
     results.theta0 = theta0;
+    results.CPo = CPo;
+    results.CP = CP;
+    results.Power = Power;
 end

@@ -17,3 +17,8 @@ fprintf('Total inflow ratio (lambda) at Vz = 0 m/s: %.4f\n', results.lambda(1));
 fprintf('Total inflow ratio (lambda) at Vz = 5 m/s: %.4f\n', results.lambda(2));
 fprintf('Collective pitch angle (theta0) at Vz = 0 m/s: %.4f rad\n', results.theta0(1));
 fprintf('Collective pitch angle (theta0) at Vz = 5 m/s: %.4f rad\n', results.theta0(2));
+fprintf('Profile Power Coefficient (CPo): %.5f\n', results.CPo);
+fprintf('Power Coefficient (CP): %.7f at Vz = 0 m/s\n', results.CP(1));
+fprintf('Power Coefficient (CP): %.7f at Vz = 5 m/s\n', results.CP(2));
+fprintf('Power (P): %.4f  kW at Vz = 0 m/s\n', results.Power(1));
+fprintf('Power (P): %.4f kW at Vz = 5 m/s\n', results.Power(2));
