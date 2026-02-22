@@ -6,7 +6,7 @@
 %   Rotor Parameters
 % ---------------------
 % here we type the rotor parameters, such as number of blades, blade length, etc.
-params.D = 11;                         % Diameter of the rotor [m]
+params.D = 11.5;                       % Diameter of the rotor [m]
 params.R = params.D/2;                 % Radius of the rotor [m]
 params.m = 3000;                       % Mass of the helicopter [kg]
 params.n_blades = 4;                   % Number of blades

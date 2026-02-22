@@ -12,7 +12,7 @@ function results = bet(params)
     % ----------------------------------------------------------
 
     % Thrust Coefficient
-    Ct = params.W / (params.rho * params.n_blades * params.Omega^2 * params.R^4);
+    Ct = params.W / (params.rho*params.S*params.Omega^2*params.R^2);
 
     % Initialize vectors
     CPi = zeros(length(params.Vz),1); % Induced Power Coefficient
@@ -27,10 +27,10 @@ function results = bet(params)
     lambda(:) = lambda_i(:) + params.Vz(:)/(params.Omega*params.R); 
     
     % Global solidity: is S_blades/S_disk, where S_blades is the total blade area and S_disk is the rotor disk area 
-    sigma = params.n_blades*integral(@(x) params.c(x), 0, 1) / (pi*params.R^2);
+    sigma = params.n_blades*integral(@(x) params.c(x), 0, 1) / (pi*params.R);
 
     % Theta distribution
-    theta0(:) = 6/(sigma*params.CL_alpha)+ 3*lambda(:)/2 - 3*params.theta_t; % Collective pitch angle
+    theta0(:) = 6/(sigma*params.CL_alpha)*Ct + 3*lambda(:)/2 - 3*params.theta_t/4; % Collective pitch angle
 
     % Alicia: queda hacer la integral del Cpo y luego sacar Cp y la potencia. 
 
