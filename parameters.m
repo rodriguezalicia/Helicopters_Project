@@ -6,20 +6,20 @@
 %   Rotor Parameters
 % ---------------------
 % here we type the rotor parameters, such as number of blades, blade length, etc.
-params.D = 11;                         % Diameter of the rotor [m]
+params.D = 11.5;                         % Diameter of the rotor [m]
 params.R = params.D/2;                 % Radius of the rotor [m]
 params.m = 3000;                       % Mass of the helicopter [kg]
 params.n_blades = 4;                   % Number of blades
 params.Omega = 340*pi/30;              % Rotational speed [rad/s]
 params.theta_twist = -1.5;             % Twist slope [deg/m]
-params.theta_t = params.theta_twist*pi/180*params.R; % Twist at the tip [rad]
+params.theta_t = params.R*params.theta_twist*pi/180; % Twist at the tip [rad]
 
 % chord distribution (linear taper)
 params.c = @(x) (0) .* (x >= 0 & x <= 0.05) + ...
          (2.*x - 0.1) .* (x > 0.05 & x <= 0.2) + ...
          (0.3) .* (x > 0.2 & x <= 1);
          
-%params.c = @(x) 0.3 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
+params.c = @(x) 0.3 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
 
 % ---------------------
 %  Airfoil Parameters
@@ -28,7 +28,9 @@ params.CL_alpha = 5.73;                % Lift curve slope [1/rad]
 params.delta0 = 0.0085;
 params.delta1 = 0.263;
 params.delta2 = 0.263;
-params.x_npoints = 1000; % Number of points for the integration of Cpo
+params.x_npoints = 10000; % Number of points for the integration of Cpo
+
+params.cd = @(x) params.delta0 + params.delta1*x + params.delta2.*x.^2;
 
 % ------------------
 %   Air Parameters
