@@ -28,6 +28,8 @@ params.CL_alpha = 5.73;                % Lift curve slope [1/rad]
 params.delta0 = 0.0085;
 params.delta1 = 0.263;
 params.delta2 = 0.263;
+params.alpha_npoints = 10000; % Number of points for the integration of Cpo
+params.cd = @(x) params.delta0 + params.delta1.*x + params.delta2.*x.^2;
 
 % ------------------
 %   Air Parameters
