@@ -27,18 +27,29 @@ function results = bet(params)
     lambda(:) = lambda_i(:) + params.Vz(:)/(params.Omega*params.R); 
     
     % Global solidity: is S_blades/S_disk, where S_blades is the total blade area and S_disk is the rotor disk area 
-    sigma = params.n_blades*integral(@(x) params.c(x), 0, 1) / (pi*params.R^2);
+    int_chord = integral(params.c, 0, 1,params.x_npoints);
+    sigma = params.n_blades*int_chord / (pi*params.R^2);
 
     % Theta distribution
     theta0(:) = 6/(sigma*params.CL_alpha)+ 3*lambda(:)/2 - 3*params.theta_t; % Collective pitch angle
 
     % Profile Power Coefficient (CPo) calculation
-    alpha = linspace(0,1,params.alpha_npoints); %Defining the vector for the angles of attack alpha
-    I = 0.5*sigma.*params.cd(alpha).*alpha.^3; %Defining the integrand for the CPo integral
-    CPo = trapz(alpha,I);
+
+    CPo = zeros(params.numVz, 1);
+    for i = 1:params.numVz
+        % Define alpha for this specific Vz state
+        alpha = @(x) theta0(i) + params.theta_t.*x - lambda(i)./x;
+
+        cd = @(x) params.delta0 + params.delta1.*alpha(x) + params.delta2.*alpha(x).^2;
+
+        % Evaluate alpha(x) inside cd(), and use element-wise operations (.* and .^)
+        I = @(x) 0.5*sigma.*cd(alpha(x)).*x.^3; 
+
+        CPo(i) = integral(I, 0, 1,params.x_npoints);
+    end
 
     % Power Coefficient (CP) calculation
-    CP(:) = CPi(:) + ones(length(params.Vz),1)*CPo;
+    CP(:) = CPi(:) + ones(length(params.Vz),1).*CPo;
 
     % Power
     Power(:) = params.rho*params.S*(params.Omega*params.R)^3*CP(:)/1000;

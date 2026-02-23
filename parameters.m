@@ -19,7 +19,7 @@ params.c = @(x) (0) .* (x >= 0 & x <= 0.05) + ...
          (2.*x - 0.1) .* (x > 0.05 & x <= 0.2) + ...
          (0.3) .* (x > 0.2 & x <= 1);
          
-params.c = @(x) 0.3 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
+%params.c = @(x) 0.3 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
 
 % ---------------------
 %  Airfoil Parameters
@@ -28,8 +28,7 @@ params.CL_alpha = 5.73;                % Lift curve slope [1/rad]
 params.delta0 = 0.0085;
 params.delta1 = 0.263;
 params.delta2 = 0.263;
-params.alpha_npoints = 10000; % Number of points for the integration of Cpo
-params.cd = @(x) params.delta0 + params.delta1.*x + params.delta2.*x.^2;
+params.x_npoints = 1000; % Number of points for the integration of Cpo
 
 % ------------------
 %   Air Parameters
@@ -49,3 +48,4 @@ params.W = params.m*params.g;                       % Weight of the helicopter [
 %   - We will analyze the performance of the rotor at different vertical velocities, from hover (0 m/s) to a climb rate of 5 m/s.
 %   - Add more velocities if needed for a more detailed analysis.
 params.Vz = [0; 5]; 
+params.numVz = length(params.Vz);
