@@ -11,7 +11,8 @@ params.R = params.D/2;                 % Radius of the rotor [m]
 params.m = 621;                       % Mass of the helicopter [kg]
 params.n_blades = 2;                   % Number of blades
 params.Omega = 530*pi/30;              % Rotational speed [rad/s]
-params.theta_t = -8*pi/180; % Twist at the tip [rad]
+params.theta_twist = -8; % Twist at the tip [rad]
+params.theta_t = params.R*params.theta_twist*pi/180;
 
 % chord distribution (linear taper)
 params.c = @(x) 0.18 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
@@ -27,7 +28,7 @@ params.CL_alpha = cl_coeffs(1);                % Lift curve slope [1/rad]
 params.delta0 = cd_coeffs(3);
 params.delta1 = cd_coeffs(2);
 params.delta2 = cd_coeffs(1);
-params.x_npoints = 10000; % Number of points for the integration of Cpo
+params.x_npoints = 1000; % Number of points for the integration of Cpo
 
 params.cd = @(x) params.delta0 + params.delta1*x + params.delta2.*x.^2;
 
@@ -35,9 +36,9 @@ params.cd = @(x) params.delta0 + params.delta1*x + params.delta2.*x.^2;
 %   Air Parameters
 % ------------------
 % here we type the air parameters, such as density, viscosity, etc.
-altitudes = [0, 2000]; % 2 altitudes chosen for the hover study in [m]
-params.naltitudes = length(altitudes);
-[T, a, P, params.rho(2)] = atmosisa(altitudes(2));
+params.altitudes = [0, 2000]; % 2 altitudes chosen for the hover study in [m]
+params.naltitudes = length(params.altitudes);
+[T, a, P, params.rho(2)] = atmosisa(params.altitudes(2));
 params.rho(1) = 1.225; % air density at sea level (kg/m^3)
 params.g = 9.80665; % gravitational acceleration (m/s^2)
 
