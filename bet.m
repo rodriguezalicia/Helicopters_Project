@@ -12,29 +12,29 @@ function results = bet(params)
     % ----------------------------------------------------------
 
     % Thrust Coefficient
-    Ct = params.W / (params.rho * params.S * params.Omega^2 * params.R^2);
+    Ct(:) = params.W ./ (params.rho.* params.S* params.Omega^2 * params.R^2);
 
     % Initialize vectors
-    CPi = zeros(params.numVz,1); % Induced Power Coefficient
-    lambda_i = zeros(params.numVz,1); % Induced inflow ratio
-    lambda = zeros(params.numVz,1); % Total inflow ratio
+    CPi = zeros(params.naltitudes,1); % Induced Power Coefficient
+    lambda_i = zeros(params.naltitudes,1); % Induced inflow ratio
+    lambda = zeros(params.naltitudes,1); % Total inflow ratio
 
     % Induced Power Coefficient
-    CPi(:) = 0.5*Ct*(sqrt(2*Ct + (params.Vz(:)/(params.Omega*params.R)).^2) + params.Vz(:)/(params.Omega*params.R));
+    CPi(:) = 0.5*Ct(:).*(sqrt(2.*Ct(:) + (params.Vz/(params.Omega*params.R)).^2) + params.Vz/(params.Omega*params.R));
 
     % Lambdas
-    lambda_i(:) = 0.5*(sqrt(2*Ct + (params.Vz(:)/(params.Omega*params.R)).^2)-params.Vz(:)/(params.Omega*params.R));
-    lambda(:) = lambda_i(:) + params.Vz(:)/(params.Omega*params.R); 
+    lambda_i(:) = 0.5*(sqrt(2.*Ct(:) + (params.Vz/(params.Omega*params.R)).^2)-params.Vz/(params.Omega*params.R));
+    lambda(:) = lambda_i(:) + params.Vz/(params.Omega*params.R); 
     
     % Global solidity: is S_blades/S_disk, where S_blades is the total blade area and S_disk is the rotor disk area 
     sigma = params.n_blades*integral(params.c,0,params.R) / (pi*params.R^2);
 
     % Theta distribution
-    theta0(:) = 6*Ct/(sigma*params.CL_alpha) + 3*lambda(:)/2 - 3*params.theta_t/4; % Collective pitch angle
+    theta0(:) = 6.*Ct(:)/(sigma*params.CL_alpha) + 3*lambda(:)/2 - 3*params.theta_t/4; % Collective pitch angle
 
    % Profile Power Coefficient (CPo) calculation
-    CPo = zeros(params.numVz, 1);
-    for i = 1:params.numVz
+    CPo = zeros(params.naltitudes, 1);
+    for i = 1:params.naltitudes
         % Define alpha for this specific Vz state
         alpha = @(x) theta0(i) + params.theta_t*x - lambda(i)./x;
         
@@ -45,10 +45,10 @@ function results = bet(params)
     end
 
     % Power Coefficient (CP) calculation
-    CP(:) = CPi(:) + ones(length(params.Vz),1).*CPo;
+    CP(:) = CPi(:) + CPo(:);
 
     % Power
-    Power(:) = params.rho*params.S*(params.Omega*params.R)^3*CP(:)/1000;
+    Power(:) = params.rho(:).*params.S*(params.Omega*params.R)^3.*CP(:)/1000;
 
     % Store results in a structure
     results.Ct = Ct;
