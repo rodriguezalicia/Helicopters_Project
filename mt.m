@@ -1,6 +1,6 @@
 %%%% SIMPLE MT MODEL FOR R22 %%%%
 
-%%% INTPUT: %%%
+%%% INPUT: %%%
 % params,
 % rho (density), 
 % Vz (vertical speed) 

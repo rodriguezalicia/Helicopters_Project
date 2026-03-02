@@ -12,11 +12,7 @@ function results = bet(params)
     % ----------------------------------------------------------
 
     % Thrust Coefficient
-<<<<<<< HEAD
-    Ct = params.W / (params.rho*params.S*params.Omega^2*params.R^2);
-=======
     Ct(:) = params.W ./ (params.rho.* params.S* params.Omega^2 * params.R^2);
->>>>>>> 8c40ee3c8dd8919b4e2b1079b63069b3015a0e6f
 
     % Initialize vectors
     CPi = zeros(params.naltitudes,1); % Induced Power Coefficient
@@ -31,17 +27,10 @@ function results = bet(params)
     lambda(:) = lambda_i(:) + params.Vz/(params.Omega*params.R); 
     
     % Global solidity: is S_blades/S_disk, where S_blades is the total blade area and S_disk is the rotor disk area 
-<<<<<<< HEAD
-    sigma = params.n_blades*integral(@(x) params.c(x), 0, 1) / (pi*params.R);
-
-    % Theta distribution
-    theta0(:) = 6/(sigma*params.CL_alpha)*Ct + 3*lambda(:)/2 - 3*params.theta_t/4; % Collective pitch angle
-=======
     sigma = params.n_blades*integral(params.c,0,params.R) / (pi*params.R^2);
 
     % Theta distribution
     theta0(:) = 6.*Ct(:)/(sigma*params.CL_alpha) + 3*lambda(:)/2 - 3*params.theta_t/4; % Collective pitch angle
->>>>>>> 8c40ee3c8dd8919b4e2b1079b63069b3015a0e6f
 
    % Profile Power Coefficient (CPo) calculation
     CPo = zeros(params.naltitudes, 1);
