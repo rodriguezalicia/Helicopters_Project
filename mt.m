@@ -6,11 +6,9 @@
 % Vz (vertical speed) 
 
 %%% OUTPUT: %%%
-% vi0 (reference induced velocity at hover), 
-% vi (induced velocity), 
-% Pi (induced power)
+% results
 
-function [vi0, vi, Pi] = MT(params, Vz, rho)
+function results = mt(params, Vz, rho)
     % Define parameters and variables
     S = params.S;
     W = params.W;
@@ -24,5 +22,7 @@ function [vi0, vi, Pi] = MT(params, Vz, rho)
     Pi_ = Vz_ + vi_; % Non dimensional induced power
     
     vi = vi_ * vi0;
-    Pi = Pi_ * (W * vi0);
+    Pi = Pi_ * (W * vi0) / 1000;
+
+    results.Power = Pi;
 end
