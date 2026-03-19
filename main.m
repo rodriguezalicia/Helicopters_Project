@@ -6,25 +6,37 @@ clc; clear; close all;
 
 parameters; % Load parameters from params.m´
 
-% Call BET function to perform the analysis
-results = bet(params);
+% MT analysis
+results = mt(params, 0, 1.225);
 
-<<<<<<< HEAD
+fprintf('MT analysis for hover:\n');
+fprintf('Power (P): %.4f  kW \n', results.Power);
+
+% BET analysis
+
+% !! Comento los resultados del bet para q no de error de q no sabe q es
+% params.Vz y params.rho. Esto es lo q hay q cambiar para q sean dos inputs
+% mas aparte de params, para que al llamar a la funcion se haga como:
+% bet(params, Vz, rho), y en vez de devolver vectores solo devuelve 1 valor
+% !!
+
+%{
+results = bet(params);
 
 % Printing results
 fprintf('--------------------------------\n')
 fprintf('  Results of the analysis:\n');
 fprintf('--------------------------------\n')
 fprintf('   - Thrust Coefficient (Ct): %.4f\n', results.Ct);
+
 for i = 1:length(params.Vz)
     fprintf('   - Vz = %.2f m/s\n', params.Vz(i))
     fprintf('       - Induced Power Coefficient (CPi): %.8f\n', results.CPi(i));
     fprintf('       - Total inflow ratio (lambda): %.4f\n', results.lambda(i));
     fprintf('       - Collective pitch angle (theta0): %.4f rad\n', results.theta0(i));
 end
-=======
+
 fprintf('Results of the analysis:\n');
-<<<<<<< HEAD
 fprintf('Thrust Coefficient (Ct): %.4f\n', results.Ct);
 fprintf('Induced Power Coefficient (CPi) at Vz = 0 m/s: %.8f\n', results.CPi(1));
 fprintf('Induced Power Coefficient (CPi) at Vz = 5 m/s: %.8f\n', results.CPi(2));
@@ -37,8 +49,7 @@ fprintf('Power Coefficient (CP): %.7f at Vz = 0 m/s\n', results.CP(1));
 fprintf('Power Coefficient (CP): %.7f at Vz = 5 m/s\n', results.CP(2));
 fprintf('Power (P): %.4f  kW at Vz = 0 m/s\n', results.Power(1));
 fprintf('Power (P): %.4f kW at Vz = 5 m/s\n', results.Power(2));
->>>>>>> d33721a6cab6c6d9c11a61cb76081b88c2ac60eb
-=======
+
 fprintf('Thrust Coefficient (Ct) at h = %i m: %.4f\n', params.altitudes(1), results.Ct(1));
 fprintf('Thrust Coefficient (Ct) at h = %i m: %.4f\n', params.altitudes(2), results.Ct(2));
 fprintf('Induced Power Coefficient (CPi) at h = %i m: %.8f\n', params.altitudes(1), results.CPi(1));
@@ -53,4 +64,10 @@ fprintf('Power Coefficient (CP) at h = %i m: %.7f\n', params.altitudes(1), resul
 fprintf('Power Coefficient (CP) at h = %i m: %.7f\n', params.altitudes(2), results.CP(2));
 fprintf('Power (P) at h = %i m: %.4f  kW\n', params.altitudes(1), results.Power(1));
 fprintf('Power (P) at h = %i m: %.4f kW\n', params.altitudes(2), results.Power(2));
->>>>>>> 8c40ee3c8dd8919b4e2b1079b63069b3015a0e6f
+%}
+
+% BEMT analysis
+results = bemt(params, 0, 1.225);
+
+fprintf('BEMT analysis w/ Prandtl correction for hover:\n');
+fprintf('Power (P): %.4f  kW \n', results.Power);
