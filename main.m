@@ -71,3 +71,33 @@ results = bemt(params, 0, 1.225);
 
 fprintf('BEMT analysis w/ Prandtl correction for hover:\n');
 fprintf('Power (P): %.4f  kW \n', results.Power);
+
+%% BET forward flight
+
+% Velocities vector
+
+V_vector = 0:2:100; % [m/s]
+P_total = zeros(size(V_vector));
+Theta0 = zeros(size(V_vector));
+
+for i = 1:length(V_vector)
+    V_current = V_vector(i);
+
+    % Aproximacion de alpha_R duda??
+    alpha_R_current = deg2rad(-2 - (V_current/60)*5);
+
+    results = bet_ff(params, V_current, alpha_R_current, 1.225);
+
+        P_total(i) = results.Power / 1000;
+        Theta0(i) = rad2deg(results.theta_0);
+
+end
+
+fprintf('BET forward flight analysis:\n'); % La potencia debería salir positiva tengo que corregir algo
+plot(V_vector, P_total)
+xlabel('Forward velocity V [m/s]');
+ylabel('Power [kW]');
+figure;
+plot(V_vector, Theta0)
+xlabel('Forward velocity V [m/s]');
+ylabel('\theta_0 [deg]');
