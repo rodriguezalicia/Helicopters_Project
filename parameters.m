@@ -15,7 +15,7 @@ params.theta_twist = -8; % Twist at the tip [rad]
 params.theta_t = params.R*params.theta_twist*pi/180;
 
 % chord distribution (linear taper)
-params.c = @(x) 0.18 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
+params.c = @(x) 0.183 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
 
 % ---------------------
 %  Airfoil Parameters - NACA 63015

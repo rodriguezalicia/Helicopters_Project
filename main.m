@@ -4,14 +4,17 @@
 
 clc; clear; close all;
 
-parameters; % Load parameters from params.m´
+parameters; % Load parameters from params.m
+
+
+% Introduce a for loop to take the different altitudes
 
 % Call BET function to perform the analysis
 results = bet(params);
 
 % Printing results
 fprintf('--------------------------------\n')
-fprintf('  Results of the analysis:\n');
+fprintf('  Results of the BET analysis:\n');
 fprintf('--------------------------------\n')
 fprintf('Thrust Coefficient (Ct) at h = %i m: %.4f\n', params.altitudes(1), results.Ct(1));
 fprintf('Thrust Coefficient (Ct) at h = %i m: %.4f\n', params.altitudes(2), results.Ct(2));

@@ -22,7 +22,7 @@ function results = bet(params)
     % Induced Power Coefficient
     CPi(:) = 0.5*Ct(:).*(sqrt(2.*Ct(:) + (params.Vz/(params.Omega*params.R)).^2) + params.Vz/(params.Omega*params.R));
 
-    % Lambdas
+    % Lambdas from MT
     lambda_i(:) = 0.5*(sqrt(2.*Ct(:) + (params.Vz/(params.Omega*params.R)).^2)-params.Vz/(params.Omega*params.R));
     lambda(:) = lambda_i(:) + params.Vz/(params.Omega*params.R); 
     
@@ -39,9 +39,9 @@ function results = bet(params)
         alpha = @(x) theta0(i) + params.theta_t*x - lambda(i)./x;
         
         % Evaluate alpha(x) inside cd(), and use element-wise operations (.* and .^)
-        I = @(x) 0.5 * sigma * params.cd(alpha(x)) .* x.^3; 
+        dCPo = @(x) 0.5 * sigma * params.cd(alpha(x)) .* x.^3; 
         
-        CPo(i) = integral(I, 0, 1);
+        CPo(i) = integral(dCPo, 0, 1);
     end
 
     % Power Coefficient (CP) calculation
@@ -49,6 +49,8 @@ function results = bet(params)
 
     % Power
     Power(:) = params.rho(:).*params.S*(params.Omega*params.R)^3.*CP(:)/1000;
+    Pi(:) = params.rho(:).*params.S*(params.Omega*params.R)^3.*CPi(:)/1000;
+    Po(:) = params.rho(:).*params.S*(params.Omega*params.R)^3.*CPo(:)/1000;
 
     % Store results in a structure
     results.Ct = Ct;
@@ -58,4 +60,5 @@ function results = bet(params)
     results.CPo = CPo;
     results.CP = CP;
     results.Power = Power;
+    results.FM = Pi/(Pi+Po);
 end
