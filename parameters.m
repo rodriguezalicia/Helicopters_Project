@@ -35,19 +35,9 @@ params.cd = @(x) params.delta0 + params.delta1*x + params.delta2.*x.^2;
 % ------------------
 %   Air Parameters
 % ------------------
-% here we type the air parameters, such as density, viscosity, etc.
-params.altitudes = [0, 2000]; % 2 altitudes chosen for the hover study in [m]
-params.naltitudes = length(params.altitudes);
-[T, a, P, params.rho(2)] = atmosisa(params.altitudes(2));
-params.rho(1) = 1.225; % air density at sea level (kg/m^3)
 params.g = 9.80665; % gravitational acceleration (m/s^2)
 
 % Calculate rest of parameters
 params.S = pi*params.R^2;                           % Rotor disk area [m^2]
 params.W = params.m*params.g;                       % Weight of the helicopter [N]
 
-% --------------------------
-%   Helicopter Parameters
-% --------------------------
-% Velocity for hover
-params.Vz = 0; 

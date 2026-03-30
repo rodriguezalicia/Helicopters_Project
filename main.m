@@ -6,27 +6,56 @@ clc; clear; close all;
 
 parameters; % Load parameters from params.m
 
+% Define flight conditions
+altitudes = [0, 2000];
+params.Vz = 0;
 
-% Introduce a for loop to take the different altitudes
+% =======================================================
+%    MAIN - Main script for Helicopter Rotor Analysis
+% =======================================================
+clc; clear; close all;
+parameters; % Load parameters from params.m
+% Define flight conditions
+altitudes = [0, 2000];
+params.Vz = 0;
 
-% Call BET function to perform the analysis
-results = bet(params);
-
-% Printing results
-fprintf('--------------------------------\n')
-fprintf('  Results of the BET analysis:\n');
-fprintf('--------------------------------\n')
-fprintf('Thrust Coefficient (Ct) at h = %i m: %.4f\n', params.altitudes(1), results.Ct(1));
-fprintf('Thrust Coefficient (Ct) at h = %i m: %.4f\n', params.altitudes(2), results.Ct(2));
-fprintf('Induced Power Coefficient (CPi) at h = %i m: %.8f\n', params.altitudes(1), results.CPi(1));
-fprintf('Induced Power Coefficient (CPi) at h = %i m: %.8f\n', params.altitudes(2), results.CPi(2));
-fprintf('Total inflow ratio (lambda) at h = %i m: %.4f\n', params.altitudes(1), results.lambda(1));
-fprintf('Total inflow ratio (lambda) at h = %i m: %.4f\n', params.altitudes(2), results.lambda(2));
-fprintf('Collective pitch angle (theta0) at h = %i m: %.4f rad\n', params.altitudes(1), results.theta0(1));
-fprintf('Collective pitch angle (theta0) at h = %i m: %.4f rad\n', params.altitudes(2), results.theta0(2));
-fprintf('Profile Power Coefficient (CPo) at h = %i m: %.5f\n', params.altitudes(1), results.CPo(1));
-fprintf('Profile Power Coefficient (CPo) at h = %i m: %.5f\n', params.altitudes(2), results.CPo(2));
-fprintf('Power Coefficient (CP) at h = %i m: %.7f\n', params.altitudes(1), results.CP(1));
-fprintf('Power Coefficient (CP) at h = %i m: %.7f\n', params.altitudes(2), results.CP(2));
-fprintf('Power (P) at h = %i m: %.4f  kW\n', params.altitudes(1), results.Power(1));
-fprintf('Power (P) at h = %i m: %.4f kW\n', params.altitudes(2), results.Power(2));
+% =======================================================
+%    ANALYSIS LOOP & PRINTING
+% =======================================================
+fprintf('========================================================================================\n');
+fprintf('                          RESULTS OF THE AERODYNAMIC ANALYSIS                           \n');
+fprintf('========================================================================================\n');
+for i = 1:length(altitudes)
+    
+    h = altitudes(i);
+    
+    % Dynamically calculate air density for this specific altitude
+    [~, ~, ~, rho] = atmosisa(h);
+    params.rho = rho; % Inject current density into the params struct
+    
+    % Run the aerodynamic analyses for THIS specific altitude
+    results_MT         = mt(params);
+    results_BET        = bet(params);
+    results_BET_losses = bet_losses(params);
+    
+    % Print results dynamically in a side-by-side comparison table
+    fprintf('\n>>> ALTITUDE: %i m (rho = %.4f kg/m^3) <<<\n', h, params.rho);
+    fprintf('----------------------------------------------------------------------------------------\n');
+    fprintf('%-32s | %-15s | %-15s | %-15s\n', 'Parameter', 'MT (Global)', 'BET (No Losses)', 'BET (With Losses)');
+    fprintf('----------------------------------------------------------------------------------------\n');
+    
+    % Standard numerical outputs for all three methods
+    fprintf('%-32s | %-15.4f | %-15.4f | %-15.4f\n', 'Thrust Coefficient (Ct)',           results_MT.Ct,     results_BET.Ct,     results_BET_losses.Ct);
+    fprintf('%-32s | %-15.8f | %-15.8f | %-15.8f\n', 'Induced Power Coefficient (CPi)',   results_MT.CPi,    results_BET.CPi,    results_BET_losses.CPi);
+    fprintf('%-32s | %-15.4f | %-15.4f | %-15.4f\n', 'Total inflow ratio (lambda)',       results_MT.lambda, results_BET.lambda, results_BET_losses.lambda);
+    
+    % Variables that MT cannot calculate (printed as strings '---')
+    fprintf('%-32s | %-15s | %-15.4f | %-15.4f\n', 'Collective pitch (theta0) [rad]',   '---',             results_BET.theta0, results_BET_losses.theta0);
+    fprintf('%-32s | %-15s | %-15.5f | %-15.5f\n', 'Profile Power Coefficient (CPo)',   '---',             results_BET.CPo,    results_BET_losses.CPo);
+    
+    % For MT, Total CP is just CPi. Total Power is just Pi.
+    fprintf('%-32s | %-15.7f | %-15.7f | %-15.7f\n', 'Total Power Coefficient (CP)',      results_MT.CPi,    results_BET.CP,     results_BET_losses.CP);
+    fprintf('%-32s | %-15.4f | %-15.4f | %-15.4f\n', 'Total Power (P) [kW]',              results_MT.Power,  results_BET.Power,  results_BET_losses.Power);
+    fprintf('----------------------------------------------------------------------------------------\n');
+    
+end

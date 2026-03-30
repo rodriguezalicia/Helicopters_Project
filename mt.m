@@ -10,10 +10,14 @@
 % vi (induced velocity), 
 % Pi (induced power)
 
-function [vi0, vi, Pi] = MT(params, Vz, rho)
+function results = mt(params)
     % Define parameters and variables
     S = params.S;
     W = params.W;
+    Vz = params.Vz;
+    rho = params.rho;
+    Omega = params.Omega;
+    R = params.R;
     
     % Calculations
     vi0 = sqrt(W ./ (2 .* rho .* S)); % Reference induced velocity at hover
@@ -25,4 +29,20 @@ function [vi0, vi, Pi] = MT(params, Vz, rho)
     
     vi = vi_ * vi0;
     Pi = Pi_ * (W * vi0);
+
+    Ct = W / (rho * S * Omega^2 * R^2);
+    lambda = (Vz + vi) / (Omega * R);
+    CPi = Ct * lambda; 
+    Power_kW = Pi / 1000; % Convert Watts to kW for the table
+
+    % Return the results
+    results.vi = vi;
+    results.vi0 = vi0;
+    results.Pi = Pi;
+    
+    % Table compatibility outputs
+    results.Ct = Ct;
+    results.lambda = lambda;
+    results.CPi = CPi;
+    results.Power = Power_kW;
 end
