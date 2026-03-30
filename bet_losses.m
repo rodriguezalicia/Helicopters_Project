@@ -1,14 +1,7 @@
 % =================================================================
-%    BET - Blade Element Theory for Helicopter Rotor Analysis
+%    BET - Blade Element Theory (WITH LOSSES - EXACT KINEMATICS)
 % =================================================================
 function results = bet_losses(params)
-    % ----------------------------------------------------------
-    %   BET - Blade Element Theory for Helicopter Rotor Analysis
-    % Inputs:
-    %   params - structure containing all the parameters for the analysis
-    % Outputs:
-    %   results - structure containing the results of the analysis
-    % ----------------------------------------------------------
     
     % Thrust Coefficient from MT (It is fixed by the helicopter's weight)
     Ct_MT = params.W / (params.rho * params.S * params.Omega^2 * params.R^2);
@@ -23,7 +16,7 @@ function results = bet_losses(params)
     lambda_i = 0.5*(sqrt(2*(Ct_MT/B^2) + (params.Vz/(params.Omega*params.R))^2)-params.Vz/(params.Omega*params.R));
     lambda = lambda_i + params.Vz/(params.Omega*params.R); 
     
-    % Global solidity: is S_blades/S_disk, where S_blades is the total blade area and S_disk is the rotor disk area 
+    % Global solidity
     sigma = params.n_blades*integral(params.c,0,params.R) / (pi*params.R^2);
     
     % Blade discretization for numerical integration
@@ -37,23 +30,16 @@ function results = bet_losses(params)
     % Find collective pitch (theta0) using fzero to match Ct_MT exactly
     dCt = @(th0) 0.5 * sigma * params.CL_alpha .* ((th0 + params.theta_t .* x) - phi) .* x.^2;
     Ct_integral = @(th0) trapz(x, dCt(th0)) - Ct_MT;
-    theta0 = fzero(Ct_integral, 0.5); % Collective pitch angle
     
-    % Pitch limiter safety check
-    theta_0_max = deg2rad(15.4);
-    if abs(theta0) > theta_0_max
-        theta0 = sign(theta0) * theta_0_max;     
-    end
+    % Solve for theta0 (No limiters!)
+    theta0 = fzero(Ct_integral, 0.5); 
     
     % Induced Power Coefficient
-    dCPi = phi .* dCt(theta0);
+    dCPi = phi .*x.* dCt(theta0);
     CPi = trapz(x, dCPi);
     
     % Profile Power Coefficient (CPo) calculation
-    % Define alpha for this specific Vz state using the exact phi
     alpha = (theta0 + params.theta_t .* x) - phi;
-    
-    % Evaluate alpha(x) inside cd(), and use element-wise operations (.* and .^)
     Cd = params.cd(alpha);
     dCPo = 0.5 * sigma .* Cd .* x.^3;
     CPo = trapz(x, dCPo);
@@ -61,7 +47,7 @@ function results = bet_losses(params)
     % Power Coefficient (CP) calculation
     CP = CPi + CPo;
     
-    % Power
+    % Dimensional Power [kW]
     Power = params.rho * params.S * (params.Omega * params.R)^3 * CP / 1000;
     Pi = params.rho * params.S * (params.Omega * params.R)^3 * CPi / 1000;
     Po = params.rho * params.S * (params.Omega * params.R)^3 * CPo / 1000;
