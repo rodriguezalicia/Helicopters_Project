@@ -1,0 +1,88 @@
+% =================================================================
+%    BET - Blade Element Theory for Forward Flight
+% =================================================================
+
+function results = bet_ff(params, V, alpha_R,rho)
+
+% Velocity components
+
+V_forward = V*cos(alpha_R);
+V_normal = V*sin(alpha_R);
+OmegaR = params.Omega*params.R;
+
+% Forward flight parameter
+
+mu_x = V_forward / OmegaR ;
+
+% Normal velocity parameter
+% lambda = (V_normal - vi) / OmegaR 
+% Necesitamos resolver vi
+CT_req = params.W / (rho * params.S * (OmegaR)^2);
+
+% De MT sacamos lambda_i = CT / (2 * sqrt(mu_x^2 + lambda^2))
+
+    lambda = 0.05; 
+    for i = 1:15
+        lambda = (V_normal / OmegaR) - CT_req / (2 * sqrt(mu_x^2 + lambda^2));
+    end
+
+
+
+
+UT = @(x, psi) OmegaR * (-mu_x * sin(psi) - x);
+UP = @(x, psi) OmegaR * lambda * ones(size(x));
+
+% theta = theta0 + theta_t*x
+theta_tw = params.theta_t;
+phi = @(x, psi) lambda ./ (mu_x * sin(psi) + x);
+%alpha = theta - phi
+
+sigma_x = @(x) (params.n_blades * params.c(x)) / (pi * params.R);
+
+function CT = calculate_CT(th0)
+        % dCT = 0.5 * sigma * Cl_alpha * (theta - phi) * (UT/OmegaR)^2
+        dCT = @(x, psi) 0.5 * sigma_x(x) .* (params.CL_alpha * ((th0 + x * params.theta_t) - phi(x, psi))) .* (mu_x * sin(psi) + x).^2;
+            
+       
+        CT = (1/(2*pi)) * integral2(dCT, 0.15, 1.0, 0, 2*pi);
+end
+
+% Bisection method
+
+th_0l = deg2rad(-5); % lower limit
+th_0u = deg2rad(25); % upper limit
+i_max = 50;
+tol = 1e-5;
+e = 1;
+i = 1;
+
+while i <= i_max && e > tol
+        th_00 = (th_0l + th_0u) / 2; % Bisecton
+        C_T_current = calculate_CT(th_00);
+        
+        if C_T_current > CT_req
+            th_0u = th_00; 
+        else
+            th_0l = th_00; 
+        end
+        
+        e = abs((C_T_current - CT_req) / CT_req);
+        i = i + 1;
+end
+if e > tol
+        error("theta0 not found");
+end
+
+theta_0 = th_00 ;
+alpha = @(x, psi) (theta_0 + x * params.theta_t) - phi(x, psi);
+dCP0= @(x, psi) 0.5 * sigma_x(x) .* params.cd(alpha(x, psi)) .*abs(mu_x * sin(psi) + x).^3;
+
+CP0 = (1/(2*pi)) * integral2(dCP0, 0.15, 1.0, 0, 2*pi);
+CPi = C_T_current * lambda;
+Power = (CP0 + CPi) * (rho * params.S * OmegaR^3); % [W]
+
+% Results
+
+results = struct('CP0', CP0, 'CPi', CPi, 'theta_0', theta_0,'Power', Power);
+
+end
