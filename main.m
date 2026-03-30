@@ -1,18 +1,6 @@
 % =======================================================
 %    MAIN - Main script for Helicopter Rotor Analysis
 % =======================================================
-
-clc; clear; close all;
-
-parameters; % Load parameters from params.m
-
-% Define flight conditions
-altitudes = [0, 2000];
-params.Vz = 0;
-
-% =======================================================
-%    MAIN - Main script for Helicopter Rotor Analysis
-% =======================================================
 clc; clear; close all;
 parameters; % Load parameters from params.m
 % Define flight conditions
