@@ -4,45 +4,35 @@
 function results = bet_losses(params)
     
     % Thrust Coefficient from MT (It is fixed by the helicopter's weight)
-    Ct_MT = params.W / (params.rho * params.S * params.Omega^2 * params.R^2);
+    Ct_MT = params.W/(params.rho*params.S*params.Omega^2*params.R^2);
     
     % For BET: reduction of effective radius, we will use Prandtl's Model
-    B = 1 - sqrt(2*Ct_MT)/params.n_blades;
-    
-    % Induced velocity --> T = W for hovering in MT (adjusted for effective area)
-    v_io = (1/B)*sqrt(params.W/(2*params.rho*params.S));
+    B = 1-sqrt(2*Ct_MT)/params.n_blades;
     
     % Lambdas from MT
-    lambda_i = 0.5*(sqrt(2*(Ct_MT/B^2) + (params.Vz/(params.Omega*params.R))^2)-params.Vz/(params.Omega*params.R));
-    lambda = lambda_i + params.Vz/(params.Omega*params.R); 
-    
+    lambda_i = 0.5*(sqrt(2*(Ct_MT/B^2)+(params.Vz/(params.Omega*params.R))^2)-params.Vz/(params.Omega*params.R));
+    lambda = lambda_i+params.Vz/(params.Omega*params.R); 
+   
     % Global solidity
-    sigma = params.n_blades*integral(params.c,0,params.R) / (pi*params.R^2);
+    sigma = params.n_blades*integral(params.c,0,params.R)/(pi*params.R^2);
     
-    % Blade discretization for numerical integration
-    N = 500;
-    x = linspace(0.01, B, N); % Integrate strictly up to the effective radius B
+    % Define the integrand as a function of both x and th0.
+    % (Operations must be element-wise for x, which you've already done!)
+    dCt = @(x, th0) 0.5*sigma*params.CL_alpha.*((th0+params.theta_t.*x)-lambda./x).*x.^2;
     
-    % Exact inflow angle (phi) without small-angle approximation
-    phi = atan((params.Vz + v_io) ./ (params.Omega * params.R .* x));
+    % Define the objective function for fzero.
+    Ct_integral = @(th0) integral(@(x) dCt(x, th0), 1e-3, B) - Ct_MT;
     
-    % Theta distribution
-    % Find collective pitch (theta0) using fzero to match Ct_MT exactly
-    dCt = @(th0) 0.5 * sigma * params.CL_alpha .* ((th0 + params.theta_t .* x) - phi) .* x.^2;
-    Ct_integral = @(th0) trapz(x, dCt(th0)) - Ct_MT;
-    
-    % Solve for theta0 (No limiters!)
-    theta0 = fzero(Ct_integral, 0.5); 
+    % Solve for theta0
+    theta0 = fzero(Ct_integral, 0);
     
     % Induced Power Coefficient
-    dCPi = phi .*x.* dCt(theta0);
-    CPi = trapz(x, dCPi);
+    dCPi = @(x) lambda./x.*x.*dCt(x, theta0);
+    CPi = integral(dCPi, 1e-3, B);
     
     % Profile Power Coefficient (CPo) calculation
-    alpha = (theta0 + params.theta_t .* x) - phi;
-    Cd = params.cd(alpha);
-    dCPo = 0.5 * sigma .* Cd .* x.^3;
-    CPo = trapz(x, dCPo);
+    dCPo = @(x) 0.5*sigma.*params.cd((theta0 + params.theta_t.*x) - (lambda./x)).*x.^3;
+    CPo = integral(dCPo, 1e-3, B);
     
     % Power Coefficient (CP) calculation
     CP = CPi + CPo;

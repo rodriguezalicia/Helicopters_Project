@@ -6,12 +6,12 @@
 %   Rotor Parameters
 % ---------------------
 % here we type the rotor parameters, such as number of blades, blade length, etc.
-params.D = 7.67;                         % Diameter of the rotor [m]
+params.D = 7.67;                       % Diameter of the rotor [m]
 params.R = params.D/2;                 % Radius of the rotor [m]
-params.m = 621;                       % Mass of the helicopter [kg]
+params.m = 621;                        % Mass of the helicopter [kg]
 params.n_blades = 2;                   % Number of blades
 params.Omega = 530*pi/30;              % Rotational speed [rad/s]
-params.theta_twist = -8; % Twist at the tip [rad]
+params.theta_twist = -8;               % Twist at the tip [deg]
 params.theta_t = params.R*params.theta_twist*pi/180;
 
 % chord distribution (linear taper)
