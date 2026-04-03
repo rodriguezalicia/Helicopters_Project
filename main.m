@@ -24,28 +24,28 @@ for i = 1:length(altitudes)
     params.rho = rho; % Inject current density into the params struct
     
     % Run the aerodynamic analyses for THIS specific altitude
-    results_MT         = mt(params);
-    results_BET        = bet(params);
-    results_BET_losses = bet_losses(params);
+    results_MT(i)         = mt(params);
+    results_BET(i)        = bet(params);
+    results_BET_losses(i) = bet_losses(params);
     
     % Calculate dimensional power multiplier to convert Coefficients to kW
     power_mult = params.rho * params.S * (params.Omega * params.R)^3 / 1000;
     
     % Extract and calculate dimensional powers [kW]
     % MT Global assumes parasitic power is 0, so Total Power = Induced Power
-    Pi_MT = results_MT.Power; 
+    Pi_MT = results_MT(i).Power; 
     Po_MT = 0.0000;
     P_MT  = Pi_MT + Po_MT;
     
     % BET Ideal
-    Pi_BET = results_BET.CPi * power_mult;
-    Po_BET = results_BET.CPo * power_mult;
-    P_BET  = results_BET.Power; % We already calculated Total Power inside the struct!
+    Pi_BET = results_BET(i).CPi * power_mult;
+    Po_BET = results_BET(i).CPo * power_mult;
+    P_BET  = results_BET(i).Power; % We already calculated Total Power inside the struct!
     
     % BET With Losses
-    Pi_BET_losses = results_BET_losses.CPi * power_mult;
-    Po_BET_losses = results_BET_losses.CPo * power_mult;
-    P_BET_losses  = results_BET_losses.Power;
+    Pi_BET_losses = results_BET_losses(i).CPi * power_mult;
+    Po_BET_losses = results_BET_losses(i).CPo * power_mult;
+    P_BET_losses  = results_BET_losses(i).Power;
     
     % Print results dynamically in a side-by-side comparison table
     fprintf('\n---> ALTITUDE: %i m (rho = %.4f kg/m^3)\n', h, params.rho);
@@ -65,3 +65,8 @@ for i = 1:length(altitudes)
     fprintf('----------------------------------------------------------------------------------------\n');
     
 end
+
+bar(altitudes,[results_MT(1).Power results_BET(1).Power results_BET_losses(1).Power; results_MT(2).Power results_BET(2).Power results_BET_losses(2).Power])
+legend('MT','BET','BET with losses','Interpreter','latex','FontSize',15)
+xlabel('Altitude [m]','Interpreter','latex','FontSize',15)
+ylabel('Power [kW]','Interpreter','latex','FontSize',15)
