@@ -24,9 +24,11 @@ for i = 1:length(altitudes)
     params.rho = rho; % Inject current density into the params struct
     
     % Run the aerodynamic analyses for THIS specific altitude
-    results_MT(i)         = mt(params);
-    results_BET(i)        = bet(params);
-    results_BET_losses(i) = bet_losses(params);
+    results_MT(i)          = mt(params);
+    results_BET(i)         = bet(params);
+    results_BET_losses(i)  = bet_losses(params);
+    results_BEMT(i)        = bemt(params, 0, false);
+    results_BEMT_losses(i) = bemt(params, 0, true);
     
     % Calculate dimensional power multiplier to convert Coefficients to kW
     power_mult = params.rho * params.S * (params.Omega * params.R)^3 / 1000;
@@ -46,27 +48,37 @@ for i = 1:length(altitudes)
     Pi_BET_losses = results_BET_losses(i).CPi * power_mult;
     Po_BET_losses = results_BET_losses(i).CPo * power_mult;
     P_BET_losses  = results_BET_losses(i).Power;
+
+    % BEMT Ideal
+    Pi_BEMT = results_BEMT(i).CPi * power_mult;
+    Po_BEMT = results_BEMT(i).CPo * power_mult;
+    P_BEMT  = results_BEMT(i).Power; % We already calculated Total Power inside the struct!
+    
+    % BEMT With Losses
+    Pi_BEMT_losses = results_BEMT_losses(i).CPi * power_mult;
+    Po_BEMT_losses = results_BEMT_losses(i).CPo * power_mult;
+    P_BEMT_losses  = results_BEMT_losses(i).Power;
     
     % Print results dynamically in a side-by-side comparison table
     fprintf('\n---> ALTITUDE: %i m (rho = %.4f kg/m^3)\n', h, params.rho);
     fprintf('----------------------------------------------------------------------------------------\n');
-    fprintf('%-28s | %-15s | %-15s | %-15s\n', 'Parameter', 'MT (Global)', 'BET (No Losses)', 'BET (With Losses)');
+    fprintf('%-28s | %-15s | %-15s | %-15s | %-15s | %-15s\n', 'Parameter', 'MT (Global)', 'BET (No Losses)', 'BET (With Losses)', 'BEMT (No Losses)', 'BEMT (With Losses)');
     fprintf('----------------------------------------------------------------------------------------\n');
     
     % Print Power Components
-    fprintf('%-28s | %-15.4f | %-15.4f | %-15.4f\n', 'Induced Power (Pi) [kW]',     Pi_MT, Pi_BET, Pi_BET_losses);
-    fprintf('%-28s | %-15.4f | %-15.4f | %-15.4f\n', 'Parasitic Power (Po) [kW]',   Po_MT, Po_BET, Po_BET_losses);
+    fprintf('%-28s | %-15.4f | %-15.4f | %-15.4f | %-15.4f | %-15.4f\n', 'Induced Power (Pi) [kW]',     Pi_MT, Pi_BET, Pi_BET_losses, Pi_BEMT, Pi_BEMT_losses);
+    fprintf('%-28s | %-15.4f | %-15.4f | %-15.4f | %-15.4f | %-15.4f\n', 'Parasitic Power (Po) [kW]',   Po_MT, Po_BET, Po_BET_losses, Po_BEMT, Po_BEMT_losses);
     
     % Visual divider for the sum
     fprintf('----------------------------------------------------------------------------------------\n');
     
     % Print Total Power
-    fprintf('%-28s | %-15.4f | %-15.4f | %-15.4f\n', 'Total Power (P) [kW]',          P_MT, P_BET, P_BET_losses);
+    fprintf('%-28s | %-15.4f | %-15.4f | %-15.4f | %-15.4f | %-15.4f\n', 'Total Power (P) [kW]',          P_MT, P_BET, P_BET_losses, P_BEMT, P_BEMT_losses);
     fprintf('----------------------------------------------------------------------------------------\n');
     
 end
 
-bar(altitudes,[results_MT(1).Power results_BET(1).Power results_BET_losses(1).Power; results_MT(2).Power results_BET(2).Power results_BET_losses(2).Power])
-legend('MT','BET','BET with losses','Interpreter','latex','FontSize',15)
+bar(altitudes,[results_MT(1).Power results_BET(1).Power results_BET_losses(1).Power results_BEMT(1).Power results_BEMT_losses(1).Power; results_MT(2).Power results_BET(2).Power results_BET_losses(2).Power results_BEMT(2).Power results_BEMT_losses(2).Power])
+legend('MT','BET','BET with losses','BEMT','BEMT with losses','Interpreter','latex','FontSize',15)
 xlabel('Altitude [m]','Interpreter','latex','FontSize',15)
 ylabel('Power [kW]','Interpreter','latex','FontSize',15)

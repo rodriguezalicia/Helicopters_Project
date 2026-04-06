@@ -8,11 +8,10 @@
 % here we type the rotor parameters, such as number of blades, blade length, etc.
 params.D = 7.67;                       % Diameter of the rotor [m]
 params.R = params.D/2;                 % Radius of the rotor [m]
-params.m = 621;                        % Mass of the helicopter [kg]
+params.m = 621;                        % MTOM of the helicopter [kg]
 params.n_blades = 2;                   % Number of blades
 params.Omega = 530*pi/30;              % Rotational speed [rad/s]
-params.theta_twist = -8;               % Twist at the tip [deg]
-params.theta_t = params.R*params.theta_twist*pi/180;
+params.theta_t = deg2rad(-8); % Twist at the tip / unit rate of twist [rad]
 
 % chord distribution (linear taper)
 params.c = @(x) 0.183 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)         
@@ -20,7 +19,7 @@ params.c = @(x) 0.183 * ones(size(x)); % Constant chord distribution (uncomment 
 % ---------------------
 %  Airfoil Parameters - NACA 63015
 % ---------------------
-airfoil_data = readmatrix('xf-n63015a-il-50000.csv');
+airfoil_data = readmatrix('xf-n63015a-il-1000000.csv'); % Use Re = 1e6 instead of 10K because its closer to our case
 airfoil_data(:,1) = deg2rad(airfoil_data(:,1));
 cl_coeffs = polyfit(airfoil_data(:,1),airfoil_data(:,2),1);
 cd_coeffs = polyfit(airfoil_data(:,1),airfoil_data(:,3),2);
