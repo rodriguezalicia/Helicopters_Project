@@ -31,7 +31,7 @@ function results = bemt(params, Vz, useLosses)
     % Calculations
     C_T_req = (W/(rho * S * (w*R)^2)); % The required thrust coeff. for hover
     
-    sigma = @(x) (nb * c(x)) / (pi*R);
+    sigma = @(x) nb * integral(@(x) c(x),0,1) / (pi*R);
     
     th = @(x, th_0_) (th_0_ + x.*th_t);
     
@@ -106,7 +106,8 @@ function results = bemt(params, Vz, useLosses)
 
         lambda = @(x) (v_i0(x))./(w*R); 
         phi = @(x) (lambda(x)./x);
-        alpha = @(x) (th(x) - phi(x));
+        alpha = @(x) (0) .* (x >= 0 & x <= 0.55/11.8) + ...
+        (th(x) - phi(x));
         f2 = @(x) (F(x) .* 0.5.*sigma(x).*lambda(x).*cl_a.*alpha(x).*x.^2 );
         C_Pi = integral(f2, 0, 1);
     else

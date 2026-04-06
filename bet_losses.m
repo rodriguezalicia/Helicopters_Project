@@ -14,25 +14,30 @@ function results = bet_losses(params)
     lambda = lambda_i+params.Vz/(params.Omega*params.R); 
    
     % Global solidity
-    sigma = params.n_blades*integral(params.c,0,params.R)/(pi*params.R^2);
+    sigma = params.n_blades*integral(@(x) params.c(x),0,1)*params.R/(pi*params.R^2);
     
     % Define the integrand as a function of both x and th0.
     % (Operations must be element-wise for x, which you've already done!)
     dCt = @(x, th0) 0.5*sigma*params.CL_alpha.*((th0+params.theta_t.*x)-lambda./x).*x.^2;
     
     % Define the objective function for fzero.
-    Ct_integral = @(th0) integral(@(x) dCt(x, th0), 1e-3, B) - Ct_MT;
+    Ct_integral = @(th0) integral(@(x) dCt(x, th0), 0, B) - Ct_MT;
     
     % Solve for theta0
     theta0 = fzero(Ct_integral, 0);
+
+    % Profile Power Coefficient (CPo) calculation
+   % Define alpha for this specific Vz state
+    alpha = @(x) (0) .* (x >= 0 & x <= 0.55/11.8) + ...
+   (theta0 + params.theta_t.*x - lambda./x) .* (x > 0.55/11.8 & x <= 1);
     
     % Induced Power Coefficient
     dCPi = @(x) lambda./x.*x.*dCt(x, theta0);
-    CPi = integral(dCPi, 1e-3, B);
+    CPi = integral(dCPi, 0, B);
     
     % Profile Power Coefficient (CPo) calculation
-    dCPo = @(x) 0.5*sigma.*params.cd((theta0 + params.theta_t.*x) - (lambda./x)).*x.^3;
-    CPo = integral(dCPo, 1e-3, B);
+    dCPo = @(x) 0.5*sigma.*params.cd(alpha(x)).*x.^3;
+    CPo = integral(dCPo, 0, B);
     
     % Power Coefficient (CP) calculation
     CP = CPi + CPo;

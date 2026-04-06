@@ -22,14 +22,15 @@ function results = bet(params)
     lambda = lambda_i + params.Vz/(params.Omega*params.R); 
     
     % Global solidity: is S_blades/S_disk, where S_blades is the total blade area and S_disk is the rotor disk area 
-    sigma = params.n_blades*integral(params.c,0,params.R) / (pi*params.R^2);
+    sigma = params.n_blades*integral(@(x) params.c(x),0,1)*params.R / (pi*params.R^2);
 
     % Theta distribution
     theta0 = 6*Ct/(sigma*params.CL_alpha) + 3*lambda(:)/2 - 3*params.theta_t/4; % Collective pitch angle
 
    % Profile Power Coefficient (CPo) calculation
    % Define alpha for this specific Vz state
-   alpha = @(x) theta0 + params.theta_t*x - lambda./x;
+   alpha = @(x) (0) .* (x >= 0 & x <= 0.55/11.8) + ...
+   (theta0 + params.theta_t.*x - lambda./x) .* (x > 0.55/11.8 & x <= 1);
 
    % Evaluate alpha(x) inside cd(), and use element-wise operations (.* and .^)
    dCPo = @(x) 0.5 * sigma * params.cd(alpha(x)) .* x.^3;
