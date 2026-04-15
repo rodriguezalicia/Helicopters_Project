@@ -2,7 +2,7 @@
 % BEMT + Prescribed Wake Model for Helicopter Rotor Analysis
 % =====================================================================
 
-function results = presc_wake(params)
+function results = pw(params)
 % ----------------------------------------------------------
     %   PW - Blade Element Momentum Theory with Prescribed Wake
     % Inputs:
