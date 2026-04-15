@@ -12,6 +12,7 @@ params.m = 621;                        % MTOM of the helicopter [kg]
 params.n_blades = 2;                   % Number of blades
 params.Omega = 530*pi/30;              % Rotational speed [rad/s]
 params.theta_t = deg2rad(-8); % Twist at the tip / unit rate of twist [rad]
+params.m_blade = 11.79;                % Mass of a single blade [kg]
 
 % chord distribution (linear taper)
 %params.c = @(x) 0.183 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)   
@@ -43,4 +44,4 @@ params.g = 9.80665; % gravitational acceleration (m/s^2)
 % Calculate rest of parameters
 params.S = pi*params.R^2;                           % Rotor disk area [m^2]
 params.W = params.m*params.g;                       % Weight of the helicopter [N]
-
+params.Iy = params.m_blade*params.R^2 / 4 + (params.m_blade / (params.R * integral(@(x) params.c(x),0,1)))* integral(@(x) params.c(x),0,1)*(params.R^3 / 12);
