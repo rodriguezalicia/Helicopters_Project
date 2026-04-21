@@ -88,7 +88,7 @@ Y(3)   = inflow_wind(3) - inflow_induced(3) - A_matrix(3,3)*beta_c;
 M(4,1) = 0;                             % beta_0 no afecta 
 M(4,2) = params.n_blades * (1/4) * params.rho * integral(@(x) params.c(x),0,1) * params.CL_alpha * params.Omega^2 * params.R^3 * (2/3 + mu_x^2);         
 M(4,3) = params.n_blades * (1/4) * params.rho * integral(@(x) params.c(x),0,1) * params.CL_alpha * params.Omega^2 * params.R^3 * mu_x;                    
-M(4,4) = 0;                             % theta_c no afecta al empuje longitudinal
+M(4,4) = 0;                             % theta_c no afecta 
 Y(4)   = Td - params.n_blades * (1/4) * params.rho * integral(@(x) params.c(x),0,1) * params.CL_alpha * params.Omega^2 * params.R^3*(lambda_x - lambda_i);
 
 sol = M \ Y;
