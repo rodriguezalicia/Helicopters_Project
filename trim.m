@@ -1,4 +1,3 @@
-%% TRIM %%
 function results = trim(params, results_MT)
  
 params.S_fp = 2.8 * 0.0929; % Convertir a m2. Airframe equivalent flat plate area [ft^2] - Paper de Maryland
@@ -19,7 +18,7 @@ delta_x = 0.15; % distance in x from shaft to CG
 delta_z = 1.5;  % distance in z from shaft to CG 
 
 % Longitudinal flapping to ensure moment equilibrium (rotor axis passes through CG) 
-beta_c = atan(delta_x / delta_z);% [cite: 309]
+beta_c = atan(delta_x / delta_z);
 beta_s = 0; % Assuming lateral trim is neglected (symmetric flight)
 
 % 2. Flow Parameters
@@ -102,5 +101,6 @@ results.alpha_d = alpha_d;
 results.beta_c = beta_c;
 results.beta_s = beta_s;
 results.thrust = Td;
+results.lambda_i = lambda_i;
 
 end
