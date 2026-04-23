@@ -88,3 +88,50 @@ bar(altitudes,[results_MT(1).Power results_BET(1).Power results_BET_losses(1).Po
 legend('MT','BET','BET with losses','BEMT','BEMT with losses','BEMT with prescribed wake','Interpreter','latex','FontSize',15)
 xlabel('Altitude [m]','Interpreter','latex','FontSize',15)
 ylabel('Power [kW]','Interpreter','latex','FontSize',15)
+
+
+%% WORKFLOW 2 ADVANCED TRIM
+
+
+for i = 1:length(altitudes)
+ 
+    h = altitudes(i);
+    [~, ~, ~, rho] = atmosisa(h);
+    params.rho = rho;
+ 
+    results_trim(i) = trim(params, results_MT(i));
+    Td_aero(i) = aero_module_simple (params, results_trim(i).theta_0, results_trim(i).theta_s, results_trim(i).lambda_i);
+    [beta_0_bd(i), theta_s_bd(i), theta_c_bd(i)] = blade_dynamics(params, results_trim(i).theta_0, results_trim(i).beta_c, results_trim(i).beta_s);
+
+    % Use as an initial guess for theta_0 the results obtained for trim
+    theta_0_init = results_trim(i).theta_0;
+ 
+    % Workflow 2 function
+    results_wf2(i) = workflow2_trim(params, results_MT(i), theta_0_init);
+   
+ 
+    % Convergence check
+    if results_wf2(i).converged
+        fprintf('\n  Altitude %d m: converged  |residual| = %.4f N\n', h, results_wf2(i).residual);
+    else
+        warning('  [!!]  Altitude %d m: did NOT converge\n', h);
+    end
+ 
+    % Print results
+    sep = repmat('-', 1, 58);
+    fprintf('  --- Altitude: %d m  (rho = %.4f kg/m^3) ---\n', h, params.rho);
+    fprintf('  %s\n', sep);
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'theta_0  (collective)',     results_wf2(i).theta_0, rad2deg(results_wf2(i).theta_0));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'theta_s  (long. cyclic)',   results_wf2(i).theta_s, rad2deg(results_wf2(i).theta_s));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'theta_c  (lat. cyclic)',    results_wf2(i).theta_c, rad2deg(results_wf2(i).theta_c));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_0   (coning angle)',   results_wf2(i).beta_0,  rad2deg(results_wf2(i).beta_0));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_c   (long. flapping)', results_wf2(i).beta_c,  rad2deg(results_wf2(i).beta_c));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'alpha_D  (disk tilt)',      results_wf2(i).alpha_D, rad2deg(results_wf2(i).alpha_D));
+    fprintf('  %s\n', sep);
+    fprintf('  %-32s | %10.2f N\n', 'T_D    (required thrust)', results_wf2(i).T_D);
+    fprintf('  %-32s | %10.2f N\n', 'T_aero (achieved thrust)', results_wf2(i).T_aero);
+    fprintf('  %s\n', sep);
+ 
+end
+
+
