@@ -134,4 +134,30 @@ for i = 1:length(altitudes)
  
 end
 
+% Plot Angles vs Altitude
+
+
+data_0m = [results_wf2(1).theta_0, results_wf2(1).theta_s, results_wf2(1).theta_c, ...
+           results_wf2(1).beta_0,  results_wf2(1).beta_c,  results_wf2(1).alpha_D] * (180/pi);
+
+data_2000m = [results_wf2(2).theta_0, results_wf2(2).theta_s, results_wf2(2).theta_c, ...
+              results_wf2(2).beta_0,  results_wf2(2).beta_c,  results_wf2(2).alpha_D] * (180/pi);
+
+plot_data = [data_0m; data_2000m];
+
+
+figure('Color', 'w');
+b = bar(altitudes, plot_data, 'grouped'); 
+xlabel('Altitude [m]', 'Interpreter', 'latex', 'FontSize', 15)
+ylabel('Angles [deg]', 'FontSize', 15) 
+xticks(altitudes);
+grid on;
+
+
+legend({'\theta_0 (Collective)', '\theta_s (Long. Cyclic)', '\theta_c (Lat. Cyclic)', ...
+        '\beta_0 (Coning)', '\beta_c (Long. Flapping)', '\alpha_D (Disk Tilt)'}, ...
+        'Location', 'northeastoutside', 'FontSize', 12);
+
+title('Advanced Trim', 'FontSize', 14);
+
 
