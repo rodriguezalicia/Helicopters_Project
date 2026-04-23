@@ -1,7 +1,7 @@
 function Td = aero_module_simple (params, theta_0, theta_s, lambda_i)
 
 % No twist, no taper and induced velocity from MT
-    S_fp = 2.8 * 0.0929;
+    S_fp = params.S_fp;
     S = params.S;
     W = params.W;
     rho = params.rho;
