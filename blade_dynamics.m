@@ -1,4 +1,4 @@
-function [beta_0, theta_s, theta_c] = blade_dynamics(params, theta_0, beta_c, beta_s)
+function [beta_0, theta_s, theta_c, lambda_i] = blade_dynamics(params, theta_0, beta_c, beta_s)
 
 W = params.W;
 m_blade = params.m_blade;
@@ -7,28 +7,33 @@ R = params.R;
 rho = params.rho;
 V = params.V;
 S = params.S;
-alpha_r = params.alpha_r;
+
+Df = 1/2 * params.rho * params.V^2 * params.S_fp; 
+alpha_d = -Df / params.W;
+alpha_r = alpha_d;
+
+% alpha_r = params.alpha_r;
 nb = params.n_blades;
 Iy = params.Iy;
 
-    % Glauert iterative solution
-    vi0    = sqrt(W / (2 * rho * S));
-    Vz     = -V * sin(alpha_r);
-    Vx     =  V * cos(alpha_r);
-    Vz_nd  = Vz / vi0;
-    Vx_nd  = Vx / vi0;
+% Glauert iterative solution
+vi0    = sqrt(W / (2 * rho * S));
+Vz     = -V * sin(alpha_r);
+Vx     =  V * cos(alpha_r);
+Vz_nd  = Vz / vi0;
+Vx_nd  = Vx / vi0;
 
-    fun    = @(vi_nd) vi_nd * sqrt(Vx_nd^2 + (Vz_nd + vi_nd)^2) - 1;
-    vi_nd  = fsolve(fun, 1, optimset('Display','off'));
-    vi     = vi_nd * vi0;
+fun    = @(vi_nd) vi_nd * sqrt(Vx_nd^2 + (Vz_nd + vi_nd)^2) - 1;
+vi_nd  = fsolve(fun, 1, optimset('Display','off'));
+vi     = vi_nd * vi0;
 
-    mu_x     = Vx / (Omega * R);           
-    lambda_x = Vz / (Omega * R);           
-    lambda_i = vi  / (Omega * R);          
+mu_x     = Vx / (Omega * R);
+lambda_x = Vz / (Omega * R);
+lambda_i = vi  / (Omega * R);
 
- 
-           
-    gamma = rho * params.CL_alpha * integral(@(x) params.c(x),0,1) * R^4 / Iy;
+
+
+gamma = rho * params.CL_alpha * integral(@(x) params.c(x),0,1) * R^4 / Iy;
 
 
 
