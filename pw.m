@@ -11,7 +11,7 @@ function results = pw(params)
     %   results - structure containing the results of the analysis
     % ----------------------------------------------------------
 
-    % Parameters 
+    %Parameters
     S = params.S;
     W = params.W;
     R = params.R;
@@ -28,6 +28,12 @@ function results = pw(params)
     sigma = @(x) (nb * c(x)) / (pi*R);
     th_fun = @(x, th_0) (th_0 + x.*th_t);
 
+    f_wake = @(x) (1 - 0.3*x.^2); % Wake shape (non-zero at tip)
+
+    norm_factor = integral(@(x) f_wake(x).*x, 0.15, 1); % Normalize wake 
+
+    k_ind = 1.15; % Induced loss factor
+
     % Iteration for theta_0
     i = 1;
     i_max = 1000;
@@ -42,29 +48,26 @@ function results = pw(params)
         th_0 = (th_0l + th_0h) / 2;
 
         % Estimate lambda0 using previous CT assumption
-        lambda0 = sqrt(C_T_req / 2);
-
-        % Wake shape function
-        f_wake = @(x) sqrt(1 - x.^2);
+        lambda0 = k_ind * sqrt(C_T_req / 2);
 
         % Induced inflow distribution
-        lambda = @(x) lambda0 .* f_wake(x);
+        lambda = @(x) lambda0 .* f_wake(x) ./ (2*norm_factor);
 
-        f1 = @(x) ( sigma(x) .* cl_a .* ...
-            (th_fun(x, th_0) - lambda(x)./x) .* x.^2 / 2 );
+        f1 = @(x) ( sigma(x) .* cl_a .* (th_fun(x, th_0) - lambda(x)./x) .* x.^2 / 2 );
 
-        C_T = integral(f1, 0.15, 1); % avoid singularity at root for integral limits
+        C_T = integral(f1, 0.15, 1); % 0.15 to avoid singularity at root
 
-        % Update lambda0 
-        lambda0 = sqrt(abs(C_T) / 2);
-        lambda = @(x) lambda0 .* f_wake(x);
+        % Update lambda0 with computed CT
+        lambda0 = k_ind * sqrt(abs(C_T) / 2);
+        lambda = @(x) lambda0 .* f_wake(x) ./ (2*norm_factor);
 
-        % Recompute thrust with updated inflow
+        % Recompute thrust
         f1 = @(x) ( sigma(x) .* cl_a .* ...
             (th_fun(x, th_0) - lambda(x)./x) .* x.^2 / 2 );
 
         C_T = integral(f1, 0.15, 1);
 
+        % Bisection method update
         if C_T > C_T_req
             th_0h = th_0;
         else
