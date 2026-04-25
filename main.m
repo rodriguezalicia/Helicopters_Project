@@ -160,4 +160,15 @@ legend({'\theta_0 (Collective)', '\theta_s (Long. Cyclic)', '\theta_c (Lat. Cycl
 
 title('Advanced Trim', 'FontSize', 14);
 
+%% REVERSE FLOW REGION
+
+for i = 1:length(altitudes)
+ % Same loop as before
+    h = altitudes(i);
+    [~, ~, ~, rho] = atmosisa(h);
+    params.rho = rho;
+    reverse_flow(params, h);
+ 
+end
+
 
