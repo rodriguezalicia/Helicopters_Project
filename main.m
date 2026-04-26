@@ -171,4 +171,17 @@ for i = 1:length(altitudes)
  
 end
 
+%% ANGLE OF ATTACK DURING A REVOLUTION
+
+for i = 1:length(altitudes)
+ 
+    h = altitudes(i);
+    [~, ~, ~, rho] = atmosisa(h);
+    params.rho = rho;
+    %  theta_0, theta_s, theta_c, alpha_D from results_wf2(i)
+    angle_attack_revolution(params, results_wf2(i), h);
+ 
+end
+
+
 
