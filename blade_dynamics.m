@@ -1,7 +1,6 @@
 function [beta_0, theta_s, theta_c, lambda_i] = blade_dynamics(params, theta_0, beta_c, beta_s)
 
 W = params.W;
-m_blade = params.m_blade;
 Omega = params.Omega;
 R = params.R;
 rho = params.rho;
@@ -13,7 +12,6 @@ alpha_d = -Df / params.W;
 alpha_r = alpha_d;
 
 % alpha_r = params.alpha_r;
-nb = params.n_blades;
 Iy = params.Iy;
 
 % Glauert iterative solution

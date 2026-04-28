@@ -14,12 +14,13 @@ Df = 1/2 * params.rho * params.V^2 * params.S_fp; % Fuselage Drag
 alpha_d = -Df / params.W; % Required rotor disk tilt 
 
 % Center of Mass offsets (using the typical ratio from the slides) 
-delta_x = 0.15; % distance in x from shaft to CG 
-delta_z = 1.5;  % distance in z from shaft to CG 
+delta_x = params.deltaX; % distance in x from shaft to CG 
+delta_y = params.deltaY;
+delta_z = params.deltaZ;  % distance in z from shaft to CG 
 
 % Longitudinal flapping to ensure moment equilibrium (rotor axis passes through CG) 
 beta_c = atan(delta_x / delta_z);
-beta_s = 0; % Assuming lateral trim is neglected (symmetric flight)
+beta_s = atan(delta_y / delta_z); % Assuming lateral trim is neglected (symmetric flight)
 
 % 2. Flow Parameters
 % As a starting approximation, assume shaft angle alpha_r is close to alpha_d

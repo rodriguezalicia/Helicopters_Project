@@ -100,8 +100,9 @@ for i = 1:length(altitudes)
     params.rho = rho;
  
     results_trim(i) = trim(params, results_MT(i));
-    Td_aero(i) = aero_module_simple (params, results_trim(i).theta_0, results_trim(i).theta_s, results_trim(i).lambda_i);
     [beta_0_bd(i), theta_s_bd(i), theta_c_bd(i)] = blade_dynamics(params, results_trim(i).theta_0, results_trim(i).beta_c, results_trim(i).beta_s);
+    [Td_aero(i),Qd_aero(i),Yd_aero(i)] = aero_module_simple (params, results_trim(i).theta_0, results_trim(i).theta_s, results_trim(i).theta_c, results_trim(i).beta_0, results_trim(i).beta_s,results_trim(i).beta_c,results_trim(i).lambda_i);
+
 
     % Use as an initial guess for theta_0 the results obtained for trim
     theta_0_init = results_trim(i).theta_0;
@@ -128,8 +129,10 @@ for i = 1:length(altitudes)
     fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_c   (long. flapping)', results_wf2(i).beta_c,  rad2deg(results_wf2(i).beta_c));
     fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'alpha_D  (disk tilt)',      results_wf2(i).alpha_D, rad2deg(results_wf2(i).alpha_D));
     fprintf('  %s\n', sep);
-    fprintf('  %-32s | %10.2f N\n', 'T_D    (required thrust)', results_wf2(i).T_D);
-    fprintf('  %-32s | %10.2f N\n', 'T_aero (achieved thrust)', results_wf2(i).T_aero);
+    fprintf('  %-32s | %10.2f N\n', 'T_D    (required axial thrust)', results_wf2(i).T_D);
+    fprintf('  %-32s | %10.2f N\n', 'T_d    (achieved axial thrust)', results_wf2(i).Td);
+    fprintf('  %-32s | %10.2f N\n', 'Y_D    (achieved lateral thrust)', results_wf2(i).Yd);
+    fprintf('  %-32s | %10.2f Nm\n', 'Q_D    (achieved torque)', results_wf2(i).Qd);
     fprintf('  %s\n', sep);
  
 end
@@ -149,16 +152,16 @@ plot_data = [data_0m; data_2000m];
 figure('Color', 'w');
 b = bar(altitudes, plot_data, 'grouped'); 
 xlabel('Altitude [m]', 'Interpreter', 'latex', 'FontSize', 15)
-ylabel('Angles [deg]', 'FontSize', 15) 
+ylabel('Angles [deg]', 'Interpreter', 'latex', 'FontSize', 15) 
 xticks(altitudes);
 grid on;
 
 
-legend({'\theta_0 (Collective)', '\theta_s (Long. Cyclic)', '\theta_c (Lat. Cyclic)', ...
-        '\beta_0 (Coning)', '\beta_c (Long. Flapping)', '\alpha_D (Disk Tilt)'}, ...
-        'Location', 'northeastoutside', 'FontSize', 12);
+legend({'$\theta_0$ (Collective)', '$\theta_s$ (Long. Cyclic)', '$\theta_c$ (Lat. Cyclic)', ...
+        '$\beta_0$ (Coning)', '$\beta_c$ (Long. Flapping)', '$\alpha_D$ (Disk Tilt)'}, ...
+        'Location', 'northeastoutside', 'Interpreter', 'latex', 'FontSize', 15);
 
-title('Advanced Trim', 'FontSize', 14);
+title('Advanced Trim', 'Interpreter', 'latex', 'FontSize', 15);
 
 %% REVERSE FLOW REGION
 

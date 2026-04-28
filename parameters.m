@@ -14,12 +14,19 @@ params.Omega = 530*pi/30;              % Rotational speed [rad/s]
 params.theta_t = deg2rad(-8); % Twist at the tip / unit rate of twist [rad]
 params.m_blade = 11.79;                % Mass of a single blade
 params.S_fp = 2.8 * 0.0929;
+params.xroot = 0.55/11.8;
+params.ecc = params.xroot*params.R;
+params.deltaX = 0.0889;
+params.deltaY = 0.026;
+params.deltaZ = 1.75/2;
+params.R_tail_rotor = 1.07/2;
+params.L_tail_rotor = params.R + params.R_tail_rotor;
 
 % chord distribution (linear taper)
 %params.c = @(x) 0.183 * ones(size(x)); % Constant chord distribution (uncomment this line to use constant chord)   
 
-params.c = @(x) (0) .* (x >= 0 & x <= 0.55/11.8) + ...
-         (0.2*0.183/0.6 + (11.8*(0.183 - 0.2*0.183/0.6)/(0.75 - 0.55)).*(x - 0.55/11.8)) .* (x > 0.55/11.8 & x <= 0.75/11.8) + ...
+params.c = @(x) (0) .* (x >= 0 & x <= params.xroot) + ...
+         (0.2*0.183/0.6 + (11.8*(0.183 - 0.2*0.183/0.6)/(0.75 - 0.55)).*(x - params.xroot)) .* (x > params.xroot & x <= 0.75/11.8) + ...
          (0.183) .* (x > 0.75/11.8 & x <= 1);
 
 % ---------------------
