@@ -1,9 +1,10 @@
 function angle_attack_revolution(params, results_wf2, h)
 
-% We define alpha as alpha = theta + phi
+% Alpha defined: alpha = theta + phi
 % theta = theta0 + theta_c + theta_twist, we get theta 0 and theta c from previous module
 % phi is the inflow ratio
 
+% Renaming parameters for better clarity
 V = params.V;
 Omega = params.Omega;
 R = params.R;
@@ -32,18 +33,14 @@ fun    = @(vi_nd) vi_nd * sqrt(Vx_nd^2 + (Vz_nd + vi_nd)^2) - 1;
 vi_nd  = fsolve(fun, 1, optimset('Display','off'));
 vi     = vi_nd * vi0;
 
-
 mu_x   = Vx / (Omega * R);                        
 lambda = V * sin(alpha_D) / (Omega * R) - vi / (Omega * R); 
-
-% x = r/R
-% psi = azimuth
 
 N_psi = 720;
 N_x   = 200;
 
 psi_vec = linspace(0, 2*pi, N_psi);
-x_vec   = linspace(0.04, 1.0, N_x);    % start away from hub to avoid infinite values
+x_vec   = linspace(params.xroot, 1, N_x);    % Start away from hub to avoid infinite values
 
 [PSI, X] = meshgrid(psi_vec, x_vec);
 
@@ -61,11 +58,11 @@ alpha_deg = rad2deg(alpha);
 alpha_deg(abs(Ut_OmegaR) < 0.02) = NaN; % reverse flow region
 
 % transform from polar to cartesian with psi
-x_cartesian =  X .* sin(PSI); % psitive in advancing side(psi=90) and egative in retreatig side (psi=270)
+x_cartesian =  X .* sin(PSI); % positive in advancing side(psi=90) and egative in retreatig side (psi=270)
 y_cartesian =  X .* cos(PSI);
 
 
-%  Plot
+%%  Plot
 
 figure;
 hold on;

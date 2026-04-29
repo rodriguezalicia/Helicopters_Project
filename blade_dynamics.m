@@ -1,5 +1,5 @@
 function [beta_0, theta_s, theta_c, lambda_i] = blade_dynamics(params, theta_0, beta_c, beta_s)
-
+% Renaming parameters for better clarity
 W = params.W;
 Omega = params.Omega;
 R = params.R;
@@ -7,7 +7,7 @@ rho = params.rho;
 V = params.V;
 S = params.S;
 
-Df = 1/2 * params.rho * params.V^2 * params.S_fp; 
+Df = 1/2 * params.rho * params.V^2 * params.S_fp; %Fuselage drag 
 alpha_d = -Df / params.W;
 alpha_r = alpha_d;
 
@@ -29,11 +29,7 @@ mu_x = Vx / (Omega * R);
 lambda_x = Vz / (Omega * R);
 lambda_i = vi  / (Omega * R);
 
-
-
 gamma = rho * params.CL_alpha * integral(@(x) params.c(x),0,1) * R^4 / Iy;
-
-
 
 % Same system as in Trim
 % A_matrix * [beta_0; beta_s; beta_c] 
@@ -47,12 +43,10 @@ B =  [(gamma/8)*(mu_x^2 + 1),  (gamma/6)*mu_x,0;
        0, 0, 1/8*(mu_x^2 + 2);
        2/3*mu_x, 1/8*(3*mu_x^2 + 2),0];
 
-
 % Inflow components 
 inflow_wind =  [gamma *(lambda_x / 6);  0; (lambda_x * mu_x) / 2];
 
 inflow_induced =  [gamma *(lambda_i/6); 0; (mu_x * lambda_i) / 2];
-
 
     % Solve system
     

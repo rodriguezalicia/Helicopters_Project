@@ -5,8 +5,8 @@ clc; clear; close all;
 parameters; % Load parameters from params.m
 
 % Define flight conditions
-altitudes = [0, 2000];
-params.Vz = 0;
+altitudes = [0, 900]; % In meters
+params.Vz = 0; % Hover case
 
 % =======================================================
 %    ANALYSIS LOOP & PRINTING
@@ -43,7 +43,7 @@ for i = 1:length(altitudes)
     % BET Ideal
     Pi_BET = results_BET(i).CPi * power_mult;
     Po_BET = results_BET(i).CPo * power_mult;
-    P_BET  = results_BET(i).Power; % We already calculated Total Power inside the struct!
+    P_BET  = results_BET(i).Power; % Total Power already calculated inside the struct
     
     % BET With Losses
     Pi_BET_losses = results_BET_losses(i).CPi * power_mult;
@@ -53,7 +53,7 @@ for i = 1:length(altitudes)
     % BEMT Ideal
     Pi_BEMT = results_BEMT(i).CPi * power_mult;
     Po_BEMT = results_BEMT(i).CPo * power_mult;
-    P_BEMT  = results_BEMT(i).Power; % We already calculated Total Power inside the struct!
+    P_BEMT  = results_BEMT(i).Power; % Total Power already calculated inside the struct
     
     % BEMT With Losses
     Pi_BEMT_losses = results_BEMT_losses(i).CPi * power_mult;
@@ -84,6 +84,7 @@ for i = 1:length(altitudes)
     
 end
 
+% Plotting all the methods for both altitudes
 bar(altitudes,[results_MT(1).Power results_BET(1).Power results_BET_losses(1).Power results_BEMT(1).Power results_BEMT_losses(1).Power results_PW(1).Power; results_MT(2).Power results_BET(2).Power results_BET_losses(2).Power results_BEMT(2).Power results_BEMT_losses(2).Power results_PW(2).Power])
 legend('MT','BET','BET with losses','BEMT','BEMT with losses','BEMT with prescribed wake','Interpreter','latex','FontSize',15)
 xlabel('Altitude [m]','Interpreter','latex','FontSize',15)
@@ -94,13 +95,15 @@ ylabel('Power [kW]','Interpreter','latex','FontSize',15)
 
 
 for i = 1:length(altitudes)
- 
+    % Dynamically calculate air density for this specific altitude
     h = altitudes(i);
     [~, ~, ~, rho] = atmosisa(h);
-    params.rho = rho;
+    params.rho = rho; % Inject current density into the params struct
  
-    results_trim(i) = trim(params, results_MT(i));
-    [beta_0_bd(i), theta_s_bd(i), theta_c_bd(i)] = blade_dynamics(params, results_trim(i).theta_0, results_trim(i).beta_c, results_trim(i).beta_s);
+    results_trim(i) = trim(params, results_MT(i)); % Calculating trimming results with MT output from previous part
+    % Calculating blade dynamics
+    [beta_0_bd(i), theta_s_bd(i), theta_c_bd(i)] = blade_dynamics(params, results_trim(i).theta_0, results_trim(i).beta_c, results_trim(i).beta_s); 
+    % Calculating the aerodynamic module
     [Td_aero(i),Qd_aero(i),Yd_aero(i)] = aero_module_simple (params, results_trim(i).theta_0, results_trim(i).theta_s, results_trim(i).theta_c, results_trim(i).beta_0, results_trim(i).beta_s,results_trim(i).beta_c,results_trim(i).lambda_i);
 
 
@@ -163,7 +166,7 @@ legend({'$\theta_0$ (Collective)', '$\theta_s$ (Long. Cyclic)', '$\theta_c$ (Lat
 
 title('Advanced Trim', 'Interpreter', 'latex', 'FontSize', 15);
 
-%% REVERSE FLOW REGION
+%% REVERSE FLOW REGION PLOT
 
 for i = 1:length(altitudes)
  % Same loop as before
@@ -181,7 +184,6 @@ for i = 1:length(altitudes)
     h = altitudes(i);
     [~, ~, ~, rho] = atmosisa(h);
     params.rho = rho;
-    %  theta_0, theta_s, theta_c, alpha_D from results_wf2(i)
     angle_attack_revolution(params, results_wf2(i), h);
  
 end
