@@ -31,6 +31,7 @@ results.theta_0     = theta_0_init;
 results.theta_s     = theta_s_sol;
 results.theta_c     = theta_c_sol;
 results.beta_0      = beta_0_sol;
+results.beta_s      = beta_s;
 results.beta_c      = beta_c;
 results.beta_s      = beta_s;
 results.alpha_D     = alpha_D;

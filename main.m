@@ -129,7 +129,8 @@ for i = 1:length(altitudes)
     fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'theta_s  (long. cyclic)',   results_wf2(i).theta_s, rad2deg(results_wf2(i).theta_s));
     fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'theta_c  (lat. cyclic)',    results_wf2(i).theta_c, rad2deg(results_wf2(i).theta_c));
     fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_0   (coning angle)',   results_wf2(i).beta_0,  rad2deg(results_wf2(i).beta_0));
-    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_c   (long. flapping)', results_wf2(i).beta_c,  rad2deg(results_wf2(i).beta_c));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_s   (long. angle)',   results_wf2(i).beta_s,  rad2deg(results_wf2(i).beta_s));
+    fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'beta_c   (lat. flapping)', results_wf2(i).beta_c,  rad2deg(results_wf2(i).beta_c));
     fprintf('  %-32s | %8.4f rad  (%7.3f deg)\n', 'alpha_D  (disk tilt)',      results_wf2(i).alpha_D, rad2deg(results_wf2(i).alpha_D));
     fprintf('  %s\n', sep);
     fprintf('  %-32s | %10.2f N\n', 'T_D    (required axial thrust)', results_wf2(i).T_D);
@@ -144,10 +145,10 @@ end
 
 
 data_0m = [results_wf2(1).theta_0, results_wf2(1).theta_s, results_wf2(1).theta_c, ...
-           results_wf2(1).beta_0,  results_wf2(1).beta_c,  results_wf2(1).alpha_D] * (180/pi);
+           results_wf2(1).beta_0,  results_wf2(1).beta_s, results_wf2(1).beta_c,  results_wf2(1).alpha_D] * (180/pi);
 
 data_2000m = [results_wf2(2).theta_0, results_wf2(2).theta_s, results_wf2(2).theta_c, ...
-              results_wf2(2).beta_0,  results_wf2(2).beta_c,  results_wf2(2).alpha_D] * (180/pi);
+              results_wf2(2).beta_0,  results_wf2(2).beta_s, results_wf2(2).beta_c,  results_wf2(2).alpha_D] * (180/pi);
 
 plot_data = [data_0m; data_2000m];
 
@@ -161,7 +162,7 @@ grid on;
 
 
 legend({'$\theta_0$ (Collective)', '$\theta_s$ (Long. Cyclic)', '$\theta_c$ (Lat. Cyclic)', ...
-        '$\beta_0$ (Coning)', '$\beta_c$ (Long. Flapping)', '$\alpha_D$ (Disk Tilt)'}, ...
+        '$\beta_0$ (Coning)', '$\beta_c$ (Long. Flapping)', '$\beta_s$ (Lat. Flapping)', '$\alpha_D$ (Disk Tilt)'}, ...
         'Location', 'northeastoutside', 'Interpreter', 'latex', 'FontSize', 15);
 
 title('Advanced Trim', 'Interpreter', 'latex', 'FontSize', 15);
