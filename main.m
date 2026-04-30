@@ -1,4 +1,4 @@
-% =======================================================
+ % =======================================================
 %    MAIN - Main script for Helicopter Rotor Analysis
 % =======================================================
 clc; clear; close all;
@@ -166,6 +166,35 @@ legend({'$\theta_0$ (Collective)', '$\theta_s$ (Long. Cyclic)', '$\theta_c$ (Lat
         'Location', 'northeastoutside', 'Interpreter', 'latex', 'FontSize', 15);
 
 title('Advanced Trim', 'Interpreter', 'latex', 'FontSize', 15);
+
+
+%% Plot relative tilting
+phi = linspace(0, 2*pi, 100);
+beta = zeros(length(altitudes), length(phi));
+for i = 1:length(altitudes)
+ % Same loop as before
+    h = altitudes(i);
+    for k = 1:length(phi)
+        beta(i, k) = results_wf2(i).beta_0 + results_wf2(i).beta_c*cos(phi(k)) + results_wf2(i).beta_s*sin(phi(k));
+    end
+end
+
+figure('Color', 'w', 'Units', 'pixels', 'Position', [100, 100, 800, 600])
+hold on
+plot(phi*180/pi, beta(1,:)*180/pi,'LineWidth',2);
+plot(phi*180/pi, beta(2,:)*180/pi,'LineWidth',2);
+xlabel('$\phi$ [deg]', 'Interpreter', 'latex', 'FontSize', 15)
+ylabel('$\beta(\phi)$','Interpreter', 'latex', 'FontSize', 15)
+set(gca, 'TickLabelInterpreter', 'latex', 'FontSize', 13) 
+grid on
+set(gca, 'GridLineStyle', ':', 'GridAlpha', 0.5, 'LineWidth', 1.1)
+box on 
+lgd = legend('$h = 0$ m', '$h = 2000$ m', ...
+    'Interpreter', 'latex', ...
+    'Location', 'best', ...
+    'FontSize', 14);
+title('Flapping Angle', 'Interpreter', 'latex')
+hold off
 
 %% REVERSE FLOW REGION PLOT
 
